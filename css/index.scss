@@ -1,0 +1,47 @@
+@import url(https://fonts.google.com/specimen/Ubuntu?selection.family=Ubuntu);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Ubuntu", sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  line-height: 1.5;
+  form {
+    width: 20%;
+  }
+  p {
+    text-align: center;
+    font-size: 1.76rem;
+  }
+  .regbutton {
+    width: 100%;
+    height: 30%;
+    border-radius: 0.3rem;
+    border: 1px solid transparent;
+    font-size: 1rem;
+    background: darkblue;
+    border-color: darkblue;
+    color: white;
+  }
+  .reginput {
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da;
+    color: gray;
+    width: 100%;
+    height: 30%;
+  }
+}

@@ -1,9 +1,9 @@
 from datetime import date
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-
+from app import db
 # Initializes SQLAlchemy object as db variable
-db = SQLAlchemy()
+
 
 # Takes local date into variable
 today = date.today()
@@ -27,6 +27,19 @@ class User(db.Model):  # User Class table
         self.email = email
         self.password = password
         self.created_date = today
+
+    def save_user_todb(self):
+        print('happening')
+        db.create_all()
+        try:
+            db.session.add(self)
+            print(self)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
 
 
 class Task(db.Model):
