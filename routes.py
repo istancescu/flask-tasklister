@@ -5,8 +5,9 @@ import models
 
 
 def non_empty_string(s):
-    if not s:
-        raise ValueError("Must not be empty string")
+    if not s or len(s) < 4:
+        raise ValueError(
+            "Must not be empty string and have more than 4 characters")
     return s
 
 
@@ -40,7 +41,6 @@ class OneUser(Resource):
 
 class SignUp(Resource):
     def post(self):
-
         req = parser.parse_args()
         new_user = models.User(
             name=req['name'],
@@ -52,3 +52,8 @@ class SignUp(Resource):
             return redirect("http://127.0.0.1:5500", code=302)
         except:
             return {'message': 'Something went wrong'}, 500
+
+
+class LogIn(Resource):
+    def post(self):
+        pass

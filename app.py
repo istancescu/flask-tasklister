@@ -7,7 +7,6 @@ import routes
 
 app = Flask(__name__)
 api = Api(app)
-
 db = SQLAlchemy(app)
 
 
@@ -18,23 +17,13 @@ api.add_resource(routes.SignUp, '/signup')
 api.add_resource(routes.UserList, '/users')
 api.add_resource(routes.OneUser, '/user/<int:id>/')
 
-#        - metarolling for db.add() -
-#     try:
-#         db.session.add(u)
-#         db.session.commit()
-#     except:
-#         db.session.rollback()
-#     finally:
-#         db.session.close()
-
-
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         app.run(debug=True)
 
 # TODO:
-# --> ADD BCrypt( from passlib.hash import bcrypt )
-# --> ADD Register Handle (request)
-# --> ADD Login Handle (request)
-# --> ACP IDEEA?
+# --> ADD BCrypt                    <---> done <---->
+# --> ADD Register Handle (request) <---> done <---->
+# --> ADD Login Handle (request)    <---> tba  <---->
+# --> ACP IDEA?                    <---> idea <---->

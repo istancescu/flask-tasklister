@@ -13,6 +13,7 @@ body {
 }
 
 .container {
+  background: #022235;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,9 +21,10 @@ body {
   height: 100%;
   line-height: 1.5;
   form {
-    width: 20%;
+    width: 18%;
   }
-  p {
+  .signup-title {
+    color: white;
     text-align: center;
     font-size: 1.76rem;
   }
@@ -32,8 +34,8 @@ body {
     border-radius: 0.3rem;
     border: 1px solid transparent;
     font-size: 1rem;
-    background: darkblue;
-    border-color: darkblue;
+    background: #04446a;
+    border-color: #04446a;
     color: white;
   }
   .reginput {
@@ -43,5 +45,15 @@ body {
     color: gray;
     width: 100%;
     height: 30%;
+    padding-left: 1rem;
+    padding-top: 0.3rem;
+    margin-bottom: 0.5rem;
+  }
+  p {
+    color: white;
+    a {
+      color: #77b7dd;
+      text-decoration: none;
+    }
   }
 }

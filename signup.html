@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="" href="css/index.css" />
   </head>
   <div class="container">
-    <p>Please sign up</p>
+    <p class="signup-title">Please sign up</p>
     <form method="POST" action="http://127.0.0.1:5000/signup">
       <br /><input
         class="reginput"
@@ -23,11 +23,16 @@
       />
       <input
         class="reginput"
-        type="text"
+        type="password"
         name="password"
         placeholder="****"
       /><br /><br />
+
       <input class="regbutton" type="submit" value="Submit" />
+      <p>
+        Already have an account? Click here
+        <a href="login.html">to login</a>
+      </p>
     </form>
   </div>
   <body></body>
