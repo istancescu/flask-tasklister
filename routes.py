@@ -1,6 +1,5 @@
 from flask_restful import Resource, reqparse
-from flask import request, redirect
-
+from flask import redirect
 import models
 
 
@@ -19,6 +18,12 @@ parser.add_argument(
 parser.add_argument(
     'email', help='This field cannot be blank', required=True, type=non_empty_string)
 
+loginParser = reqparse.RequestParser()
+loginParser.add_argument(
+    'name', help='This field cannot be blank', required=True,  type=non_empty_string)
+loginParser.add_argument(
+    'password', help='This field cannot be blank', required=True, type=non_empty_string)
+
 
 class UserList(Resource):
     def get(self):
@@ -26,7 +31,7 @@ class UserList(Resource):
         UserToDict = {}
         for user in SearchUsers:
             UserToDict[user.id] = user.name
-        return (UserToDict)
+        return UserToDict
 
 
 class OneUser(Resource):
@@ -42,6 +47,7 @@ class OneUser(Resource):
 class SignUp(Resource):
     def post(self):
         req = parser.parse_args()
+        print(req)
         new_user = models.User(
             name=req['name'],
             email=req['email'],
@@ -49,11 +55,25 @@ class SignUp(Resource):
         )
         try:
             models.User.save_user_todb(new_user)
-            return redirect("http://127.0.0.1:5500", code=302)
+            return redirect("http://127.0.0.1:5500/task_List/flask-tasklister/login.html", code=302)
         except:
             return {'message': 'Something went wrong'}, 500
 
 
 class LogIn(Resource):
     def post(self):
-        pass
+        req = loginParser.parse_args()
+        login_creds = models.User(
+            name=req['name'],
+            password=req['password'],
+            email=None
+        )
+        try:
+            if models.User.verify_password(login_creds):
+                return {'message': 'Sucessfully logged in'}, 200
+            elif models.User.verify_password(login_creds) is False:
+                return {'message': 'Incorrect password'}, 403
+            else:
+                return {'message': 'Incorrect username'}, 403
+        except:
+            return {'message': 'Something went wrong'}, 500

@@ -1,8 +1,9 @@
 from datetime import date
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-from app import db
-import bcrypt
+from app import db, bcrypt
+
+
 # Initializes SQLAlchemy object as db variable
 
 # Takes local date into variable
@@ -11,6 +12,8 @@ today = date.today()
 
 def dbCheckUp(obj1):
     db.create_all()
+    obj1.password = bcrypt.generate_password_hash(
+        obj1.password, 6).decode('utf8')
     try:
         db.session.add(obj1)
         db.session.commit()
@@ -37,12 +40,20 @@ class User(db.Model):  # User Class table
     def __init__(self, name, email, password):
         self.name = name
         self.email = email
-        self.password = bcrypt.hashpw(
-            password.encode('utf8'), bcrypt.gensalt(6))
+        self.password = password
         self.created_date = today
 
     def save_user_todb(self):
         dbCheckUp(self)
+
+    def verify_password(self):
+        user = User.query.filter_by(name=self.name).first()
+        if user is not None:
+            if (bcrypt.check_password_hash(user.password, self.password)):
+                return True
+            else:
+                return False
+            return ValueError
 
 
 class Task(db.Model):
@@ -60,5 +71,5 @@ class Task(db.Model):
         self.user_id = user_id
         self.created_date = today
 
-    def save_task_todb():
+    def save_task_todb(self):
         dbCheckUp(self)
