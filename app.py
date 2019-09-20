@@ -4,15 +4,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import models
 import routes
+from flask_jwt_extended import JWTManager
 
 
 app = Flask(__name__)
 api = Api(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@127.0.0.1:3306/'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'uihgsdruih1278SJB12#@!'
 
 api.add_resource(routes.SignUp, '/signup')
 api.add_resource(routes.LogIn, '/login')
@@ -27,6 +30,6 @@ if __name__ == "__main__":
 # TODO:
 # --> ADD BCrypt                    <----> done <---->
 # --> ADD Register Handle (request) <----> done <---->
-# --> ADD Login Handle (request)    <----> done  <---->
-# --> ADD JWT                       <----> TBA   <---->
-# --> ACP IDEA?                    <----> idea <---->
+# --> ADD Login Handle (request)    <----> done <---->
+# --> ADD JWT                       <----> TBA  <---->
+# --> ACP IDEA?                     <----> idea <---->

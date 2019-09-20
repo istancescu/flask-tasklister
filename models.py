@@ -1,7 +1,8 @@
 from datetime import date
 from flask_sqlalchemy import SQLAlchemy
+
 from sqlalchemy.orm import relationship
-from app import db, bcrypt
+from app import db, bcrypt, jwt
 
 
 # Initializes SQLAlchemy object as db variable
@@ -12,8 +13,7 @@ today = date.today()
 
 def dbCheckUp(obj1):
     db.create_all()
-    obj1.password = bcrypt.generate_password_hash(
-        obj1.password, 6).decode('utf8')
+    obj1.password = bcrypt.generate_password_hash(obj1.password, 6).decode("utf8")
     try:
         db.session.add(obj1)
         db.session.commit()
@@ -26,7 +26,8 @@ def dbCheckUp(obj1):
 
 class User(db.Model):  # User Class table
     __tablename__ = "user"
-    __table_args__ = {'schema': 'tasklister'}  # Uses schema 'tasklister'
+    __table_args__ = {"schema": "tasklister"}
+    # Uses schema 'tasklister'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False, unique=True)
@@ -35,8 +36,10 @@ class User(db.Model):  # User Class table
     created_date = db.Column(db.Date, nullable=True)
     # References relationship  as parent with Task class
     task = relationship("Task")
+    token = relationship("Token")
 
     # Constructor:
+
     def __init__(self, name, email, password):
         self.name = name
         self.email = email
@@ -49,16 +52,22 @@ class User(db.Model):  # User Class table
     def verify_password(self):
         user = User.query.filter_by(name=self.name).first()
         if user is not None:
-            if (bcrypt.check_password_hash(user.password, self.password)):
+            if bcrypt.check_password_hash(user.password, self.password):
                 return True
             else:
                 return False
-            return ValueError
+
+    def findId(name):
+        user = User.query.filter_by(name=name).first()
+        if user is not None:
+            return user.id
+        else:
+            return None
 
 
 class Task(db.Model):
     __tablename__ = "task"
-    __table_args__ = {'schema': 'tasklister'}  # Uses schema 'tasklister'
+    __table_args__ = {"schema": "tasklister"}  # Uses schema 'tasklister'
 
     id = db.Column(db.Integer, primary_key=True)
     task = db.Column(db.String(255), nullable=False)
@@ -73,3 +82,39 @@ class Task(db.Model):
 
     def save_task_todb(self):
         dbCheckUp(self)
+
+
+class Token(db.Model):
+    __tablename__ = "Token"
+    __table_args__ = {"schema": "tasklister"}
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(512), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, unique=True)
+
+    def __init__(self, token, user_id):
+        self.token = token
+        self.user_id = user_id
+
+    
+
+    def save_token_todb(self):
+        print("self user id is {}".format(self.user_id))
+        dbToken = Token.query.filter_by(user_id=self.user_id).first()
+        if dbToken is None:
+            try:
+                db.session.add(self)
+                db.session.commit()
+            except Exception as e:
+                print(e)
+                db.session.rollback()
+            finally:
+                db.session.close()
+        elif dbToken is not self.token:
+            db.session.delete(dbToken)
+            db.session.commit()
+            db.session.add(self)
+            db.session.commit()
+            return self.token
+        else:
+            return dbToken
