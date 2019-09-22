@@ -10,12 +10,12 @@ from app import db, bcrypt, jwt
 # Takes local date into variable
 today = date.today()
 
-
-def dbCheckUp(obj1):
+# Function that entries the 'user'.User object into the db.
+def dbCheckUp(user):
     db.create_all()
-    obj1.password = bcrypt.generate_password_hash(obj1.password, 6).decode("utf8")
+    user.password = bcrypt.generate_password_hash(user.password, 6).decode("utf8")
     try:
-        db.session.add(obj1)
+        db.session.add(user)
         db.session.commit()
     except Exception as e:
         print(e)
@@ -46,9 +46,11 @@ class User(db.Model):  # User Class table
         self.password = password
         self.created_date = today
 
+    # method that calls the function used to entry an user into the db
     def save_user_todb(self):
         dbCheckUp(self)
 
+    # method that verifies if the password is correct or nada
     def verify_password(self):
         user = User.query.filter_by(name=self.name).first()
         if user is not None:
@@ -57,6 +59,7 @@ class User(db.Model):  # User Class table
             else:
                 return False
 
+    # method getter that acquires an id from an username : returns user id if it exists, else returns None
     def findId(name):
         user = User.query.filter_by(name=name).first()
         if user is not None:
@@ -72,16 +75,33 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task = db.Column(db.String(255), nullable=False)
     created_date = db.Column(db.Date, nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, unique=True)
 
-    def __init__(self, id, task, user_id):
-        self.id = id
+    def __init__(self, task, user_id):
         self.task = task
         self.user_id = user_id
         self.created_date = today
 
-    def save_task_todb(self):
-        dbCheckUp(self)
+    def save_task(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+
+    def get_task(uid):
+        return Task.query.filter_by(user_id=uid).all()
+
+    def del_task(uid):
+        a = Task.query.filter_by(id=uid).first()
+        try:
+            db.session.delete(a)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
 
 
 class Token(db.Model):
@@ -95,8 +115,6 @@ class Token(db.Model):
     def __init__(self, token, user_id):
         self.token = token
         self.user_id = user_id
-
-    
 
     def save_token_todb(self):
         print("self user id is {}".format(self.user_id))
@@ -118,3 +136,4 @@ class Token(db.Model):
             return self.token
         else:
             return dbToken
+

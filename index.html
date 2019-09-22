@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Flask TaskLister</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script src="/task_List//flask-tasklister//jquery-3.4.1.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <button id="logout" class="button-tasklist">Sign out</button>
+      <p class="signup-title">Your list:</p>
+      <input type="text" placeholder="enter your input here" class="input-tasklist" />
+      <ul id="ul-tasklist" class="ul-tasklist"></ul>
+    </div>
+  </body>
+
+  <script>
+    const GET_TASK_URL = "http://127.0.0.1:5000/self/user/get_task";
+    const SAVE_TASK_URL = "http://127.0.0.1:5000/self/user/save_task";
+    const DEL_TASK_URL = "http://127.0.0.1:5000/self/user/del_task";
+    const SEND_TO_LOGIN_URL = "http://127.0.0.1:5500/task_List/flask-tasklister/login.html";
+
+    $("html")[0].style.visibility = "hidden";
+
+    var token = window.localStorage.getItem("token");
+    var form_data = { Authorization: `Bearer ${token}` };
+
+    window.onload = function() {
+      var token = window.localStorage.getItem("token");
+      var form_data = { Authorization: `Bearer ${token}` };
+      $.ajax({
+        url: GET_TASK_URL,
+        type: "POST",
+        headers: form_data
+      })
+        .done(function(response) {
+          console.log("works as intended");
+          $("html")[0].style.visibility = "visible";
+          console.log(response);
+          for (var i = 0; i < response.length; i++) {
+            $("#ul-tasklist").append(`<li dba="${response[i].id}">${response[i].task}</li>`);
+            $("#ul-tasklist").append("<button  class='button-tasklist'>Delete</button>");
+          }
+          deleteChild();
+        })
+        .fail(function(response) {
+          $(location).attr("href", SEND_TO_LOGIN_URL);
+        });
+    };
+
+    function deleteChild() {
+      $(".button-tasklist").on("click", function() {
+        var x = $(this)
+          .prev()
+          .attr("dba");
+
+        $(this)
+          .prev()
+          .remove();
+        $(this).remove();
+        console.log(form_data);
+        $.ajax({
+          url: DEL_TASK_URL,
+          type: "POST",
+          headers: form_data,
+          data: { id: x }
+        });
+      });
+    }
+
+    $("#logout").on("click", function() {
+      localStorage.setItem("token", null);
+      document.getElementsByTagName("html")[0].style.visibility = "hidden";
+      $(location).attr("href", SEND_TO_LOGIN_URL);
+    });
+
+    $(".input-tasklist").bind("enterKey", function(e) {});
+    $(".input-tasklist").keyup(function(e) {
+      if (e.keyCode == 13) {
+        var a = $(".input-tasklist").val();
+        if (a.length > 3) {
+          $("#ul-tasklist").append(`<li>${a}</li>`);
+          $("#ul-tasklist").append("<button class='button-tasklist'>Delete</button>");
+          $.ajax({
+            url: SAVE_TASK_URL,
+            type: "POST",
+            data: { task: a },
+            headers: form_data
+          })
+            .done(function(response) {
+              $("html")[0].style.visibility = "visible";
+            })
+            .fail(function(response) {
+              console.log(response);
+              alert(response.statusText);
+            });
+        } else {
+          alert("the input should have at least 4 characters");
+        }
+      }
+    });
+  </script>
+</html>

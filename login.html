@@ -5,21 +5,40 @@
     <meta charset="utf-8" />
     <title>Flask TaskLister</title>
     <link rel="stylesheet" type="" href="css/index.css" />
+    <script src="/task_List//flask-tasklister//jquery-3.4.1.min.js"></script>
   </head>
-  <div class="container">
-    <p class="signup-title">Please log in</p>
-    <form method="POST" action="http://127.0.0.1:5000/login">
-      <br />
-      <input class="reginput" type="text" name="name" placeholder="username" />
-      <input class="reginput" type="text" name="password" placeholder="****" />
-      <br />
-      <br />
-      <input class="regbutton" type="submit" value="Submit" />
-      <p>
-        Dont have an account? Click here
-        <a href="signup.html">to signup</a>
-      </p>
-    </form>
-  </div>
-  <body></body>
+  <body>
+    <div class="container">
+      <p class="signup-title">Please log in</p>
+      <form method="POST" id="login-form" action="http://127.0.0.1:5000/login">
+        <br />
+        <input class="reginput" type="text" name="name" placeholder="username" />
+        <input class="reginput" type="password" name="password" placeholder="****" />
+        <br />
+        <br />
+        <input class="regbutton" type="submit" value="Submit" />
+        <p>
+          Dont have an account? Click here
+          <a href="signup.html">to signup</a>
+        </p>
+      </form>
+    </div>
+  </body>
+  <script>
+    $("#login-form").submit(function(e) {
+      e.preventDefault();
+      let post_url = $(this).attr("action"); //get form action url
+      let request_method = $(this).attr("method"); //get form GET/POST method
+      let form_data = $(this).serialize(); //Encode form elements for submission
+
+      $.ajax({
+        url: post_url,
+        type: request_method,
+        data: form_data
+      }).done(function(response) {
+        localStorage.setItem("token", response.token);
+        $(location).attr("href", "http://127.0.0.1:5500/task_List/flask-tasklister");
+      });
+    });
+  </script>
 </html>
